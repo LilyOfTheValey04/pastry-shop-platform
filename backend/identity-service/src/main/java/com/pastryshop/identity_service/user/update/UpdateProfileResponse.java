@@ -1,4 +1,4 @@
-package com.pastryshop.identity_service.auth.update;
+package com.pastryshop.identity_service.user.update;
 
 import com.pastryshop.identity_service.user.UserRole;
 
