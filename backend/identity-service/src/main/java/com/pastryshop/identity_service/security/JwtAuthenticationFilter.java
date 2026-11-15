@@ -2,6 +2,8 @@ package com.pastryshop.identity_service.security;
 
 import com.pastryshop.identity_service.user.User;
 import com.pastryshop.identity_service.user.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,14 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         try {
-            String email = jwtService.extractEmail(token);
+            Claims claims = jwtService.parse(token);
+            Long userId = Long.valueOf(claims.getSubject());
 
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                User user = userRepository.findByEmail(email)
-                        .orElse(null);
+                User user = userRepository.findById(userId).orElse(null);
 
-                if (user != null && jwtService.isTokenValid(token)) {
+                if (user != null && user.isEnabled()) {
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
@@ -67,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             // Invalid or expired JWT.
             // The request remains unauthenticated.
         }

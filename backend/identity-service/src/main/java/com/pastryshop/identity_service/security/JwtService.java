@@ -1,5 +1,6 @@
 package com.pastryshop.identity_service.security;
 
+import com.pastryshop.identity_service.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -25,44 +26,30 @@ public class JwtService {
         );
     }
 
-    public String generateToken(String email) {
-
+    public String generateToken(User user) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
-                .subject(email)
+                .subject(String.valueOf(user.getId()))
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole().name())
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String extractEmail(String token) {
-        return getClaims(token).getSubject();
-    }
-
-    public boolean isTokenValid(String token) {
-        try {
-            Claims claims = getClaims(token);
-
-            return claims.getExpiration().after(new Date());
-
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public long getExpirationTime() {
-        return expiration;
-    }
-
-    private Claims getClaims(String token) {
-
+    // Throws JwtException if the signature is invalid or the token has expired
+    public Claims parse(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public long getExpirationTime() {
+        return expiration;
     }
 }
