@@ -1,5 +1,6 @@
 package com.pastryshop.identity_service.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
@@ -67,7 +69,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-
+        log.error("Unexpected error", ex);
         ErrorResponse response = new ErrorResponse(
                 500,
                 "INTERNAL_SERVER_ERROR",
@@ -104,6 +106,22 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+    @ExceptionHandler(AccountDisabledException.class)
+    public ResponseEntity<ErrorResponse> handleAccountDisabled(
+            AccountDisabledException ex) {
+
+        ErrorResponse response = new ErrorResponse(
+                403,
+                "ACCOUNT_DISABLED",
+                "Account is disabled.",
+                LocalDateTime.now(),
+                Map.of()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(response);
     }
 }
