@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "reservations")
-public class Reservation {
+@Table(name = "reservations", indexes = {
+        @Index(name = "idx_reservation_customer", columnList = "customer_id")
+})
+public class Reservation extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,21 +46,7 @@ public class Reservation {
     @Builder.Default
     private ReservationStatus status = ReservationStatus.PENDING;
 
-    private String notes;
+    @Version
+    private Long version;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }
