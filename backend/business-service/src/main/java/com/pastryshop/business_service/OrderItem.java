@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "order_items")
+@Table(name = "order_items", indexes = {
+        @Index(name = "idx_order_item_order", columnList = "order_id")})
 public class OrderItem {
 
     @Id
