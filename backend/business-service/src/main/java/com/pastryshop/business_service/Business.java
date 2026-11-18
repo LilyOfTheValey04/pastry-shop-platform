@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,8 +18,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "businesses")
-public class Business {
+@Table(name = "businesses", indexes = {
+        @Index(name = "idx_business_city", columnList = "city"),
+        @Index(name = "idx_business_type", columnList = "business_type"),
+        @Index(name = "idx_business_owner", columnList = "owner_id")
+})
+public class Business extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -87,20 +90,17 @@ public class Business {
     @Builder.Default
     private List<BusinessOpeningHours> openingHours = new ArrayList<>();
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    @Builder.Default
+    private String timezone = "Europe/Sofia";
+
+    // Reservations: totalSeats == null or 0 means, that the business does not accept reservations
+    private Integer totalSeats;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    @Builder.Default
+    private int reservationDurationMinutes = 90;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @Version
+    private Long version;
 }
