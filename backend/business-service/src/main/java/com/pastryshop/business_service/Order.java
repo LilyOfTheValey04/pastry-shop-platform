@@ -2,11 +2,15 @@ package com.pastryshop.business_service;
 
 import com.pastryshop.business_service.enums.Currency;
 import com.pastryshop.business_service.enums.OrderStatus;
+import com.pastryshop.business_service.enums.PaymentMethod;
+import com.pastryshop.business_service.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,8 +18,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "orders")
-public class Order {
+@Table(name = "orders", indexes = {
+        @Index(name = "idx_order_business", columnList = "business_id"),
+        @Index(name = "idx_order_customer", columnList = "customer_id")
+})
+public class Order extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +47,15 @@ public class Order {
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentMethod paymentMethod;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
     @Column(nullable = false)
     private LocalDateTime pickupTime;
 
@@ -50,21 +66,11 @@ public class Order {
     @Column(nullable = false)
     private Currency currency;
 
-    private String notes;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<OrderItem> items = new ArrayList<>();
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Version
+    private Long version;
 
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }
