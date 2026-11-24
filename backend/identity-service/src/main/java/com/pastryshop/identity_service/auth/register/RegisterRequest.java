@@ -1,7 +1,9 @@
 package com.pastryshop.identity_service.auth.register;
 
+import com.pastryshop.identity_service.auth.AccountType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.Locale;
@@ -16,7 +18,9 @@ public record RegisterRequest(
         @NotBlank(message = "First name is required")
         String firstName,
         @NotBlank(message = "Last name is required")
-        String lastName
+        String lastName,
+        @NotNull(message = "Account type is required")
+        AccountType accountType
 ) {
     public RegisterRequest {
         email = email == null ? null : email.trim().toLowerCase(Locale.ROOT);
