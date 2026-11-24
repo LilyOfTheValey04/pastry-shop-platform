@@ -14,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -35,8 +33,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
-        user.setRole(UserRole.CLIENT);
-       // user.setCreatedAt(LocalDateTime.now());
+        user.setRole(request.accountType() == AccountType.BUSINESS_OWNER ? UserRole.BUSINESS_OWNER : UserRole.CLIENT);
         return userRepository.save(user);
     }
 
