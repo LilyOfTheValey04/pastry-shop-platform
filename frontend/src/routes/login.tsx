@@ -1,10 +1,12 @@
-
+// Страница за вход — адрес /login
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { loginErrorMessage, useLogin } from "@/hooks/useLogin";
+
 /* eslint-disable react-refresh/only-export-components */
 export const Route = createFileRoute("/login")({
     head: () => ({
@@ -21,17 +23,17 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const login = useLogin();
 
     function handleSubmit(event: FormEvent) {
         event.preventDefault();
         if (!email.includes("@")) return setError("Please enter a valid email.");
         if (!password) return setError("Please enter your password.");
         setError("");
-        setError("Sign-in is not connected yet. You have not been signed in.");
+        login.mutate({ email, password });
     }
 
     return (
@@ -60,9 +62,14 @@ function LoginPage() {
 
 
                 {error && <p className="text-sm text-destructive">{error}</p>}
+                {login.isError && (
+                    <p className="text-sm text-destructive">{loginErrorMessage(login.error)}</p>
+                )}
 
-                <Button type="submit" className="h-11 w-full rounded-xl bg-gradient-primary">
-                    Sign in
+                <Button type="submit" className="h-11 w-full rounded-xl bg-gradient-primary"
+                        disabled={login.isPending}
+                >
+                    {login.isPending ? "Signing in…" : "Sign in"}
                 </Button>
             </form>
             <p className="mt-6 text-center text-sm text-muted-foreground">
