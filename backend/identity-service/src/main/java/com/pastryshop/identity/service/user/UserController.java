@@ -45,7 +45,7 @@ public class UserController {
 
         userService.deleteAccount(email);
 
-//        return ResponseEntity.noContent().build();
-        return ResponseEntity.status(200).build();
+     return ResponseEntity.noContent().build();
+
     }
 }
