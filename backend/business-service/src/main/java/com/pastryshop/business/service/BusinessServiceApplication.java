@@ -1,4 +1,4 @@
-package com.pastryshop.business_service;
+package com.pastryshop.business.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

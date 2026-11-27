@@ -1,10 +1,10 @@
-package com.pastryshop.identity_service;
+package com.pastryshop.business.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class IdentityServiceApplicationTests {
+class BusinessServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
